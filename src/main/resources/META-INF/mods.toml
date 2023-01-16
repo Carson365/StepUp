@@ -1,10 +1,10 @@
 modLoader="javafml" #mandatory
-loaderVersion="[37,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
+loaderVersion="[44,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
 license="All rights reserved"
 
 [[mods]] #mandatory
 modId="stepup" #mandatory
-version="1.18.0-0.1.1" #mandatory
+version="1.19.3-test" #mandatory
 state="Working"
 displayName="StepUp" #mandatory
 displayURL="https://www.curseforge.com/minecraft/mc-mods/stepup" #optional
@@ -18,13 +18,13 @@ description='''
 [[dependencies.stepup]] #optional
     modId="forge" #mandatory
     mandatory=true #mandatory
-    versionRange="[37,)" #mandatory
+    versionRange="[44,)" #mandatory
     ordering="NONE"
     side="CLIENT"
 
 [[dependencies.stepup]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.18,1.19)"
+    versionRange="[1.19.3]"
     ordering="NONE"
     side="CLIENT"

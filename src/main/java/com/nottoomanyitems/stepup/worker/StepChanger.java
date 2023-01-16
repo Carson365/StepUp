@@ -1,5 +1,7 @@
 package com.nottoomanyitems.stepup.worker;
 
+import net.minecraft.network.chat.*;
+import net.minecraftforge.client.event.InputEvent;
 import org.lwjgl.glfw.GLFW;
 
 import com.nottoomanyitems.stepup.StepUp;
@@ -9,13 +11,11 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
+import net.minecraftforge.client.event.InputEvent.Key;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
+
+
 
 public class StepChanger {
 	
@@ -24,7 +24,7 @@ public class StepChanger {
     public static boolean firstRun = true;
     private static boolean forceStepUp = true;
 
-    private static Minecraft mc = Minecraft.getInstance();
+    private static final Minecraft mc = Minecraft.getInstance();
 
     public StepChanger() {
         
@@ -36,7 +36,7 @@ public class StepChanger {
         
 		if (player.isCrouching()) {
             player.maxUpStep = .6f;
-        } else if (autoJumpState == AutoJumpState.DISABLED.getLevelCode() && player.maxUpStep >= 1.0f && forceStepUp == true) { //All Disabled
+        } else if (autoJumpState == AutoJumpState.DISABLED.getLevelCode() && player.maxUpStep >= 1.0f && forceStepUp) { //All Disabled
         	player.maxUpStep = .6f;
         	forceStepUp = false;
         } else if (autoJumpState == AutoJumpState.ENABLED.getLevelCode() && player.maxUpStep < 1.0f) { //StepUp Enabled
@@ -56,9 +56,9 @@ public class StepChanger {
     	int display_start_message = ConfigIO.display_start_message;
     	
     	if(firstRun){
-    	    myKey =  new KeyMapping("key.stepup.desc", GLFW.GLFW_KEY_H, "key.categories.stepup");
-    	    net.minecraftforge.client.ClientRegistry.registerKeyBinding(myKey);
-            if (VersionChecker.isLatestVersion() == false && display_update_message == 1) {
+    	    //myKey =  new KeyMapping("key.stepup.desc", GLFW.GLFW_KEY_H, "key.categories.stepup");
+            //net.minecraftforge.client.ClientRegistry.registerKeyBinding(myKey);
+            if (!VersionChecker.isLatestVersion() && display_update_message == 1) {
                 updateMessage();
             }
             firstRun = false;
@@ -70,7 +70,7 @@ public class StepChanger {
     }
     
     //@SubscribeEvent
-    public static void onKeyInput(KeyInputEvent event) {
+    public static void onKeyInput(InputEvent.Key event) {
         if (StepChanger.myKey.isDown()) {
         	int autoJumpState = ConfigIO.autoJumpState;
             if (autoJumpState == AutoJumpState.MINECRAFT.getLevelCode()) {
@@ -90,38 +90,39 @@ public class StepChanger {
     	net.minecraft.client.Options settings = mc.options;
     	int autoJumpState = ConfigIO.autoJumpState;
     	
-        boolean b = settings.autoJump;
-        if (autoJumpState < AutoJumpState.MINECRAFT.getLevelCode() && b == true) {
-            settings.autoJump = false;
-        } else if (autoJumpState == AutoJumpState.MINECRAFT.getLevelCode() && b == false) {
-            settings.autoJump = true;
+        boolean b = settings.autoJump().get();
+        if (autoJumpState < AutoJumpState.MINECRAFT.getLevelCode() && b) {
+            settings.autoJump().set(false);
+        } else if (autoJumpState == AutoJumpState.MINECRAFT.getLevelCode() && !b) {
+            settings.autoJump().set(true);
         }
     }
 
     private static void message() {
     	int autoJumpState = ConfigIO.autoJumpState;
-        String m = (Object) ChatFormatting.DARK_AQUA + "[" + (Object) ChatFormatting.YELLOW + StepUp.MOD_NAME + (Object) ChatFormatting.DARK_AQUA + "]" + " ";
+        String m = ChatFormatting.DARK_AQUA + "[" + ChatFormatting.YELLOW + StepUp.MOD_NAME + ChatFormatting.DARK_AQUA + "]" + " ";
         if (autoJumpState == AutoJumpState.DISABLED.getLevelCode()) {
-            m = m + (Object) ChatFormatting.RED + I18n.get(AutoJumpState.DISABLED.getDesc());
+            m = m + ChatFormatting.RED + I18n.get(AutoJumpState.DISABLED.getDesc());
         } else if (autoJumpState == AutoJumpState.ENABLED.getLevelCode()) {
-            m = m + (Object) ChatFormatting.BLUE + I18n.get(AutoJumpState.ENABLED.getDesc());
+            m = m + ChatFormatting.BLUE + I18n.get(AutoJumpState.ENABLED.getDesc());
         } else if (autoJumpState == AutoJumpState.MINECRAFT.getLevelCode()) {
-            m = m + (Object) ChatFormatting.GREEN + I18n.get(AutoJumpState.MINECRAFT.getDesc());
+            m = m + ChatFormatting.GREEN + I18n.get(AutoJumpState.MINECRAFT.getDesc());
         }
-        player.displayClientMessage(new TextComponent(m), true);
+        player.displayClientMessage(Component.literal(m), true);
     }
     
     private static void updateMessage() {
-        String m2 = (Object) ChatFormatting.GOLD + I18n.get("msg.stepup.updateAvailable") + ": " + (Object) ChatFormatting.DARK_AQUA + "[" + (Object) ChatFormatting.YELLOW + "StepUp-" + (Object) ChatFormatting.WHITE + VersionChecker.getLatestVersion() + (Object) ChatFormatting.DARK_AQUA + "]";
+        String m2 = ChatFormatting.GOLD + I18n.get("msg.stepup.updateAvailable") + ": " + ChatFormatting.DARK_AQUA + "[" + ChatFormatting.YELLOW + "StepUp-" + ChatFormatting.WHITE + VersionChecker.getLatestVersion() + ChatFormatting.DARK_AQUA + "]";
         String url = "https://www.curseforge.com/minecraft/mc-mods/stepup/files";
         ClickEvent versionCheckChatClickEvent = new ClickEvent(ClickEvent.Action.OPEN_URL,url);
-        HoverEvent versionCheckChatHoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent(I18n.get("msg.stepup.updateTooltip") + "!"));
-        TextComponent component = new TextComponent(m2);
+        HoverEvent versionCheckChatHoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(I18n.get("msg.stepup.updateTooltip") + "!"));
+        MutableComponent component = Component.literal(m2);
         Style s = component.getStyle();
         s.withClickEvent(versionCheckChatClickEvent);	//setClickEvent
         s.withHoverEvent(versionCheckChatHoverEvent);	//setHoverEvent
         component.setStyle(s);
-        player.sendMessage((TextComponent) component, null);
+
+        player.displayClientMessage(component, true);
     }
     
     public enum AutoJumpState

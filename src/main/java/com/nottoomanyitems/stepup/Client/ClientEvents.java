@@ -1,5 +1,9 @@
 package com.nottoomanyitems.stepup.Client;
 
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.player.KeyboardInput;
+import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -9,15 +13,15 @@ import com.nottoomanyitems.stepup.worker.StepChanger;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
+import net.minecraftforge.client.event.InputEvent.Key;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import org.lwjgl.glfw.GLFW;
 
-@OnlyIn(Dist.CLIENT)
 @EventBusSubscriber(value = Dist.CLIENT,  modid = StepUp.MODID)
 public class ClientEvents {
 	public static boolean init = true;
@@ -36,7 +40,7 @@ public class ClientEvents {
     
 	
     @SubscribeEvent
-    public static void onKeyInput(KeyInputEvent event) {
+    public static void onKeyInput(InputEvent.Key event) {
     	if(StepChanger.firstRun == false) {
     		StepChanger.onKeyInput(event);
     	}
@@ -44,17 +48,17 @@ public class ClientEvents {
     
     
     @SubscribeEvent
-    public static void joinWorld(final EntityJoinWorldEvent event) {
+    public static void joinWorld(final EntityJoinLevelEvent event) {
     }
     
     @SubscribeEvent
-    public static void unload (WorldEvent.Unload event) {
+    public static void unload (LevelEvent.Unload event) {
     	LOGGER.info("WorldEvent.Unload");
     	init=true;
     }
     
     @SubscribeEvent
-    public static void load (WorldEvent.Load event) {
+    public static void load (LevelEvent.Load event) {
     	LOGGER.info("WorldEvent.Load");
     }
 }

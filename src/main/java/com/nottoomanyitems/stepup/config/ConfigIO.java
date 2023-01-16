@@ -5,7 +5,8 @@ import com.nottoomanyitems.stepup.worker.StepChanger;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.network.chat.TextComponent;
+//import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,7 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
- 
+
 public class ConfigIO{
 	public static String CONFIG_FILE = StepUp.MODID+".cfg";
 	public static String filePath = "config/"+ CONFIG_FILE;
@@ -192,6 +193,6 @@ public class ConfigIO{
     }
     
     public static void debugMessage(String m) {
-        StepChanger.player.displayClientMessage(new TextComponent(m), true);
+        StepChanger.player.displayClientMessage(Component.literal(m), true);
     }
 }
